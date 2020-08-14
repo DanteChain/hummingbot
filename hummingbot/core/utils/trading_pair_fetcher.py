@@ -24,6 +24,7 @@ KUCOIN_ENDPOINT = "https://api.kucoin.com/api/v1/symbols"
 DOLOMITE_ENDPOINT = "https://exchange-api.dolomite.io/v1/markets"
 ETERBASE_ENDPOINT = "https://api.eterbase.exchange/api/markets"
 KRAKEN_ENDPOINT = "https://api.kraken.com/0/public/AssetPairs"
+MOONX_ENDPOINT = "https://exchange.moonx.pro/exchangeApi/match/v-instrument"
 
 API_CALL_TIMEOUT = 5
 
@@ -327,6 +328,26 @@ class TradingPairFetcher:
 
         return []
 
+    async def fetch_moonx_trading_pairs(self) -> List[str]:
+        try:
+            from hummingbot.market.moonx.moonx_market import MoonxMarket
+            client: aiohttp.ClientSession = self.http_client()
+            async with client.get(MOONX_ENDPOINT, timeout=API_CALL_TIMEOUT) as response:
+                valid_trading_pairs: List[str]
+                if response.status == 200:
+                    all_trading_pairs: Dict[str, Any] = await response.json()
+                    valid_trading_pairs = [
+                        MoonxMarket.convert_from_exchange_trading_pair(item["symbol"])
+                        for item in all_trading_pairs["data"]
+                        if (item["status"] == 1) & (item["type"] == "SPOT")
+                    ]
+                return valid_trading_pairs
+        except Exception:
+            # Do nothing if the request fails -- there will be no autocomplete for huobi trading pairs
+            pass
+
+        return []
+
     async def fetch_all(self):
         tasks = [self.fetch_binance_trading_pairs(),
                  self.fetch_bamboo_relay_trading_pairs(),
@@ -338,7 +359,8 @@ class TradingPairFetcher:
                  self.fetch_kucoin_trading_pairs(),
                  self.fetch_kraken_trading_pairs(),
                  self.fetch_radar_relay_trading_pairs(),
-                 self.fetch_eterbase_trading_pairs()]
+                 self.fetch_eterbase_trading_pairs(),
+                 self.fetch_moonx_trading_pairs()]
 
         # Radar Relay has not yet been migrated to a new version
         # Endpoint needs to be updated after migration
@@ -357,5 +379,6 @@ class TradingPairFetcher:
             "kraken": results[8],
             "radar_relay": results[9],
             "eterbase": results[10],
+            "moonx": results[11],
         }
         self.ready = True

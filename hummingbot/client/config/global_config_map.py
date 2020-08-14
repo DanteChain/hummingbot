@@ -176,6 +176,18 @@ global_config_map = {
                   type_str="bool",
                   default=False,
                   validator=validate_bool),
+    "moonx_business_num":
+        ConfigVar(key="moonx_api_key",
+                  prompt="Enter your Moonx Business key >>> ",
+                  required_if=using_exchange("moonx"),
+                  is_secure=True,
+                  is_connect_key=True),
+    "moonx_secret_key":
+        ConfigVar(key="moonx_secret_key",
+                  prompt="Enter your Moonx secret key >>> ",
+                  required_if=using_exchange("moonx"),
+                  is_secure=True,
+                  is_connect_key=True),
     "bittrex_api_key":
         ConfigVar(key="bittrex_api_key",
                   prompt="Enter your Bittrex API key >>> ",

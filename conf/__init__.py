@@ -83,6 +83,10 @@ eterbase_api_key = os.getenv("ETERBASE_API_KEY")
 eterbase_secret_key = os.getenv("ETERBASE_SECRET_KEY")
 eterbase_account = os.getenv("ETERBASE_ACCOUNT")
 
+# Moonx Tests
+moonx_business_num = os.getenv("MOONX_API_KEY")
+moonx_api_secret = os.getenv("MOONX_API_SECRET")
+
 # Wallet Tests
 test_erc20_token_address = os.getenv("TEST_ERC20_TOKEN_ADDRESS")
 web3_test_private_key_a = os.getenv("TEST_WALLET_PRIVATE_KEY_A")
